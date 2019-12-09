@@ -509,11 +509,12 @@ namespace {
 
         $html = "<img ";
         if ($source) {
+            return $source;
             $html .= "src='" . htmlspecialchars($source, ENT_QUOTES) . "' ";
         }
         $html .= Cloudinary::html_attrs($attributes) . "/>";
 
-        return $html;
+        return $source;
     }
 
     function fetch_image_tag($url, $options = array())

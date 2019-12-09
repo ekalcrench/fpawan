@@ -30,16 +30,28 @@ class UploadController extends Controller
         $fileMime = $file->getMimeType();
         $tujuan_upload = 'uploads';
         $file->move($tujuan_upload,$fileName);
-        \Cloudinary\Uploader::upload($tujuan_upload."/".$fileName);
-        Cloudinary::Uploader.upload($tujuan_upload."/".$fileName, 
-            :public_id => "brown_sheep",
-            :eager => { :quality => "jpegmini", :crop => "fill", 
-            :width => 200, :height => 150 });
-        return redirect('upload');
-    }
+        // \Cloudinary\Uploader::upload($tujuan_upload."/".$fileName, 
+        //     array("public_id" => $fileName));
+        
+            
+        $image = cl_image_tag($fileName.".jpg", 
+            array(
+                "sign_url" => true, 
+                "height"=>150, 
+                "quality"=>"jpegmini", 
+                "width"=>200, 
+                "crop"=>"fill"));
 
-    public function cloud()
-    {
-
+        $doc = new \DOMDocument();
+        $doc->loadHTML($image);
+        $xpath = new \DOMXPath($doc);
+        $source = $xpath->evaluate("string(//img/@src)");
+        $file_name = basename($source); 
+        if(file_put_contents("cloudinary/".$file_name,file_get_contents($source))) { 
+            return redirect()->back()->with('success', 'Konvert Berhasil');
+        } 
+        else { 
+            return redirect()->back()->with('failed', 'Konvert Gagal');
+        } 
     }
 }
